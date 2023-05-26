@@ -124,8 +124,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
     CSVRow patient_data = getPatientData(patientId);
     float data_reading = std::stof(reading);
     if (data_reading < patient_data["min_oxigen"].get<float>()){
-      std::cout << "PATIENT " << patientId << "AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
-      output_file << "PATIENT " << patientId << "AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
+      std::cout << "PATIENT " << patientId << " AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
+      output_file << "PATIENT " << patientId << " AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
     } else {
       std::cout << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
       output_file << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
@@ -135,8 +135,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
     CSVRow patient_data = getPatientData(patientId);
     int data_reading = std::stoi(reading);
     if (data_reading < patient_data["card_freq_lb"].get<int>() || data_reading > patient_data["card_freq_ub"].get<int>()){
-      std::cout << "PATIENT " << patientId << "AT RISK! " << sensor << " out of bounds\nSending alert!\n\n" << std::endl;
-      output_file << "PATIENT " << patientId << "AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
+      std::cout << "PATIENT " << patientId << " AT RISK! " << sensor << " out of bounds\nSending alert!\n\n" << std::endl;
+      output_file << "PATIENT " << patientId << " AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
     } else {
       std::cout << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
       output_file << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
@@ -146,8 +146,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
     CSVRow patient_data = getPatientData(patientId);
     float data_reading = std::stof(reading);
     if (data_reading < patient_data["temp_lb"].get<float>() || data_reading > patient_data["temp_ub"].get<float>()){
-      std::cout << "PATIENT " << patientId << "AT RISK! " << sensor << " out of bounds\nSending alert!\n\n" << std::endl;
-      output_file << "PATIENT " << patientId << "AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
+      std::cout << "PATIENT " << patientId << " AT RISK! " << sensor << " out of bounds\nSending alert!\n\n" << std::endl;
+      output_file << "PATIENT " << patientId << " AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
     } else {
       std::cout << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
       output_file << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
@@ -157,8 +157,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
     CSVRow patient_data = getPatientData(patientId);
     int data_reading = std::stoi(reading);
     if (data_reading < patient_data["breath_freq_lb"].get<int>() || data_reading > patient_data["breath_freq_ub"].get<int>()){
-      std::cout << "PATIENT " << patientId << "AT RISK! " << sensor << " out of bounds\nSending alert!\n\n" << std::endl;
-      output_file << "PATIENT " << patientId << "AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
+      std::cout << "PATIENT " << patientId << " AT RISK! " << sensor << " out of bounds\nSending alert!\n\n" << std::endl;
+      output_file << "PATIENT " << patientId << " AT RISK! " << sensor << " Above expected\nSending alert!\n\n" << std::endl;
     } else {
       std::cout << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
       output_file << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
@@ -265,8 +265,7 @@ int main (int argc, char *argv[]) {
                                       "ControlMode",StringValue (phyMode));
 
   // // Connecting containers to network
-  NetDeviceContainer devices;
-  wifi80211p.Install (wifiPhy, wifi80211pMac, patientsFlow);
+  NetDeviceContainer devices =  wifi80211p.Install (wifiPhy, wifi80211pMac, patientsFlow);
 
   // // Configuring each node position
   MobilityHelper mobility;
@@ -326,7 +325,6 @@ int main (int argc, char *argv[]) {
     oxigenSockets.push_back(Socket::CreateSocket (patientsFlow.Get (oxigenId), tid));
     oxigenSockets[i]->SetAllowBroadcast (true);
     oxigenSockets[i]->Connect (intermediateRemotes[i]);
-    std::cout << intermediateRemotes[i] << std::endl;
 
     // Cardiac Sensors
     cardSockets.push_back(Socket::CreateSocket (patientsFlow.Get (cardId), tid));
@@ -350,13 +348,15 @@ int main (int argc, char *argv[]) {
   }
 
   std::vector<std::string> sensorNames = {"Oxigen", "Cardiac", "Temperature", "Breath"};
+  int readings =0;
   for (auto& row : sensorReader) {
+    std::cout << "Reading: " << readings++ << std::endl;
     std::string patientId = row["patient"].get<std::string>();
     int timer = 0;
     for (auto& sensor : sensorNames){
       std::ostringstream msg;
 
-      std::cout << "Patient: " << patientId << " Sensor: " << sensor << std::endl;
+      //std::cout << "Patient: " << patientId << " Sensor: " << sensor << std::endl;
 
       if (sensor == "Oxigen") {
         msg << patientId + " Oxigen " + std::to_string(row["min_oxigen"].get<float>()) << '\0';
@@ -387,6 +387,7 @@ int main (int argc, char *argv[]) {
 
       timer++;
     }
+    std::cout << "-------------------------------------------------" << std::endl;
   }
 
   Simulator::Run ();
