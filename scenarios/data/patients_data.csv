@@ -1,0 +1,2 @@
+patient,card_freq_lb,card_freq_ub,temp_lb,temp_ub,breath_freq_lb,breath_freq_ub,min_oxigen
+0,60,100,36,38,12,20,0.9
