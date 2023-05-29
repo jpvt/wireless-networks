@@ -1,4 +1,7 @@
 # Wireless Networks
+[![GitHub license](https://img.shields.io/badge/license-MIT-blueviolet)](https://github.com/jpvt/wireless-networks/blob/main/LICENSE)
+[![Author](https://img.shields.io/badge/author-jpvt-blue)](https://www.linkedin.com/in/jpvt/)
+[![docs](https://img.shields.io/badge/docs-🇧🇷%20pt/br-darkblue.svg)](README_ptbr.md)
 
 Repository dedicated to the Wireless Networks course took at the Federal University of Paraíba. On this class, we created experiments using ns-3. The project's structure is based on [Alejandro Gomez's Network Simulator](https://github.com/alejandrogomez314/network-simulator). The experiments are implemented in the scenarios directory, where each scenario has it's own docker-compose file to setup the necessary containers and volumes. The simulations can be run using scripts that sets up th required linux networking interfaceson host and connects them to the running containers and simulation.
 
