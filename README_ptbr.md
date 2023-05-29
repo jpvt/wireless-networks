@@ -10,7 +10,7 @@ Repositório dedicado ao curso de Redes Sem Fio realizado na Universidade Federa
   - [Sumário](#sumário)
   - [Requisitos](#requisitos)
   - [Instalação](#instalação)
-  - [Scenarios](#scenarios)
+  - [Cenários](#cenários)
     - [Hello World](#hello-world)
     - [Smart Hospital](#smart-hospital)
       - [**Nós**](#nós)
@@ -92,7 +92,7 @@ Repositório dedicado ao curso de Redes Sem Fio realizado na Universidade Federa
     Done
     ```
 
-## Scenarios
+## Cenários
 
 ### Hello World
 
