@@ -8,6 +8,7 @@ Repository dedicated to the Wireless Networks course took at the Federal Univers
   - [Requeriments](#requeriments)
   - [Installation](#installation)
   - [Scenarios](#scenarios)
+    - [Hello World](#hello-world)
 
 ## Requeriments
 
@@ -59,8 +60,7 @@ Repository dedicated to the Wireless Networks course took at the Federal Univers
 3. Prepare the `hello_world.sh` script to run:
 
     ```console
-    foo@bar# cd wireless-networks/scripts
-    foo@bar# chmod a+x hello_world.sh
+    foo@bar# chmod a+x scripts/hello_world.sh
     ```
 
 4. Run the `hello_world.sh`  script:
@@ -81,8 +81,16 @@ Repository dedicated to the Wireless Networks course took at the Federal Univers
     ns3  | At time +2.00369s server sent 1024 bytes to 10.1.1.1 port 49153
     ns3  | At time +2.00737s client received 1024 bytes from 10.1.1.2 port 9
     ns3 exited with code 0
+    Done
     ```
 
 ## Scenarios
 
-In construction
+### Hello World
+
+This is a test scenario to check if your setup is working properly. There is not much to it. Files in this scenario:
+
+- script: `hello_world.sh`
+- docker compose: `scenarios/hello-world.yaml`
+- src file: `hello.cc`
+- image: `ns3.Dockerfile`
