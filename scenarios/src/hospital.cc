@@ -30,13 +30,9 @@ Ptr<Socket> serverSocket;
 
 // // Creating Actuators
 std::vector<Ptr<Socket>> oxygenActSockets;
-std::vector<InetSocketAddress> oxygenRemotes;
 std::vector<Ptr<Socket>> tempActSockets;
-std::vector<InetSocketAddress> tempRemotes;
 std::vector<Ptr<Socket>> cardActSockets;
-std::vector<InetSocketAddress> cardRemotes;
 std::vector<Ptr<Socket>> breathActSockets;
-std::vector<InetSocketAddress> breathRemotes;
 
 // // Creating Package reception at Intermediate Node
 std::vector<Ptr<Socket>> intermediateSocketsServer;
@@ -44,7 +40,6 @@ std::vector<Ptr<Socket>> intermediateSocketsToBreathAct;
 std::vector<Ptr<Socket>> intermediateSocketsToCardAct;
 std::vector<Ptr<Socket>> intermediateSocketsToTempAct;
 std::vector<Ptr<Socket>> intermediateSocketsToOxygenAct;
-std::vector<InetSocketAddress> intermediateRemotes;
 
 // // Creating Sensors
 std::vector<Ptr<Socket>> oxygenSockets;
@@ -131,30 +126,19 @@ void ReceivePacket (Ptr<Socket> socket) {
     std::ofstream output_file;
     output_file.open(filename.data(), std::ios_base::app);
     std::cout << "Package received at intermediate node from sensor, sending to server...\n" << std::endl;
-    std::cout << s << std::endl;
     output_file << "Package received at intermediate node from sensor, sending to server...\n" << std::endl;
     output_file.close();
 
     std::vector<std::string> msgData = customSplit(msg, ' ');
     std::string patientId = msgData[0];
-    std::string packetData = "INTERMEDIATE;" + msg;
+    std::string packetData = "INTERMEDIATE2SERVER;" + msg;
 
     Ptr<Packet> packet = Create<Packet> ((uint8_t*) packetData.c_str(), packetData.length());
-    //InetSocketAddress remoteServer = InetSocketAddress (Ipv4Address ("10.1.1.0"), 80);
-    // serverSocket->SetAllowBroadcast (true);
-    // serverSocket->Bind (remoteServer);
-    // serverSocket->SetRecvCallback (MakeCallback (&ReceivePacketServer));
-    // int bytesSent = serverSocket->Send (packet);
-    //intermediateSocketsServer[std::stoi(patientId)]->SetAllowBroadcast (true);
-    //intermediateSocketsServer[std::stoi(patientId)]->Connect (remoteServer);
+
     int bytesSent = intermediateSocketsServer[std::stoi(patientId)]->Send (packet);
-    std::cout << "Intermediate 2 Server Packet Data = " << packetData << std::endl;
-    // std::cout << "Socket = " << intermediateSocketsServer[std::stoi(patientId)] << std::endl;
-    std::cout << "Bytes sent = " << bytesSent << std::endl;
-    // bytesSent = socket->Send(packet);
-    // std::cout << "Socket = " << socket << std::endl;
-    // std::cout << "Bytes sent = " << bytesSent << std::endl;
-    
+    if (bytesSent == -1) {
+      std::cout << "Error sending packet to server" << std::endl;
+    }
 
   } else if (sender == "SERVER") {
     std::string filename ("scratch/hospital_logs.txt");
@@ -171,22 +155,34 @@ void ReceivePacket (Ptr<Socket> socket) {
 
     if (signalType == "Oxygen") {
       // Send to Oxygen Actuator
-      Ptr<Packet> packet = Create<Packet> ((uint8_t*) signal.c_str(), signal.length());
+      std::string actuatorNodeId = std::to_string(intermediateSocketsToOxygenAct[std::stoi(patientId)]->GetNode()->GetId());
+      //std::string packetData = "INTERMEDIATE2OXYGEN;" + actuatorNodeId + "; " + msg;
+      std::string packetData = actuatorNodeId + " INTERMEDIATE2OXYGEN; " + msg;
+      Ptr<Packet> packet = Create<Packet> ((uint8_t*) packetData.c_str(), packetData.length());
       intermediateSocketsToOxygenAct[std::stoi(patientId)]->Send (packet);
 
     } else if (signalType == "Temperature") {
       // Send to Temperature Actuator
-      Ptr<Packet> packet = Create<Packet> ((uint8_t*) signal.c_str(), signal.length());
+      std::string actuatorNodeId = std::to_string(intermediateSocketsToTempAct[std::stoi(patientId)]->GetNode()->GetId());
+      //std::string packetData = "INTERMEDIATE2TEMP;" + actuatorNodeId + "; " + msg;
+      std::string packetData = actuatorNodeId + " INTERMEDIATE2TEMP; " + msg;
+      Ptr<Packet> packet = Create<Packet> ((uint8_t*) packetData.c_str(), packetData.length());
       intermediateSocketsToTempAct[std::stoi(patientId)]->Send (packet);
 
     } else if (signalType == "Cardiac") {
       // Send to Cardiac Actuator
-      Ptr<Packet> packet = Create<Packet> ((uint8_t*) signal.c_str(), signal.length());
+      std::string actuatorNodeId = std::to_string(intermediateSocketsToCardAct[std::stoi(patientId)]->GetNode()->GetId());
+      // std::string packetData = "INTERMEDIATE2CARD;" + actuatorNodeId + "; " + msg;
+      std::string packetData = actuatorNodeId + " INTERMEDIATE2CARD; " + msg;
+      Ptr<Packet> packet = Create<Packet> ((uint8_t*) packetData.c_str(), packetData.length());
       intermediateSocketsToCardAct[std::stoi(patientId)]->Send (packet);
       
     } else if (signalType == "Breath") {
       // Send to Breath Actuator
-      Ptr<Packet> packet = Create<Packet> ((uint8_t*) signal.c_str(), signal.length());
+      std::string actuatorNodeId = std::to_string(intermediateSocketsToBreathAct[std::stoi(patientId)]->GetNode()->GetId());
+      // std::string packetData = "INTERMEDIATE2BREATH;" + actuatorNodeId + "; " + msg;
+      std::string packetData = actuatorNodeId + " INTERMEDIATE2BREATH; " + msg;
+      Ptr<Packet> packet = Create<Packet> ((uint8_t*) packetData.c_str(), packetData.length());
       intermediateSocketsToBreathAct[std::stoi(patientId)]->Send (packet);
 
     }
@@ -206,9 +202,7 @@ void ReceivePacketServer (Ptr<Socket> socket) {
   pkt->CopyData(buffer, pkt->GetSize ());
   std::string s = std::string((char*)buffer);
   std::vector<std::string> rawData = customSplit(s, ';');
-  if (!(rawData[0].find("INTERMEDIATE") != -1)) return;
-  std::cout << "RECEIVED DATA IN SERVER = " << s << std::endl;
-
+  if (!(rawData[0].find("INTERMEDIATE2SERVER") != -1)) return;
   // Create a socket for sending packets to the intermediate node
   TypeId tid = TypeId::LookupByName ("ns3::UdpSocketFactory");
   Ptr<Socket> socketToIntermediate = Socket::CreateSocket (socket->GetNode (), tid);
@@ -225,9 +219,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
   std::ofstream output_file;
   output_file.open(filename.data(), std::ios_base::app);
 
-  std::cout << "Package from " << sensor << " sensor received at server node" << std::endl;
-  std::cout << "Package from " << patientId << " patient received at server node" << std::endl;
-  output_file << "Package from " << sensor << " sensor received at server node" << std::endl;
+  std::cout << "Package " << sensor << " received at server node" << std::endl;
+  output_file << "Package " << sensor << " received at server node" << std::endl;
 
   if (sensor == "Oxygen") {
     CSVRow patient_data = getPatientData(patientId);
@@ -242,8 +235,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
       socketToIntermediate->Send (packet);
 
     } else {
-      std::cout << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
-      output_file << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
+      std::cout << sensor << "Patient " << patientId << " oxygen levels OK!\n\n" << std::endl;
+      output_file << sensor << "Patient " << patientId << " oxygen levels OK!\n\n" << std::endl;
     }
 
   } else if (sensor == "Cardiac"){
@@ -264,8 +257,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
       }
 
     } else {
-      std::cout << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
-      output_file << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
+      std::cout << sensor << "Patient " << patientId << " cardiac frequency OK!\n\n" << std::endl;
+      output_file << sensor << "Patient " << patientId << " cardiac frequency OK!\n\n" << std::endl;
     }
 
   } else if (sensor == "Temperature"){
@@ -286,8 +279,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
       }
 
     } else {
-      std::cout << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
-      output_file << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
+      std::cout << sensor << "Patient " << patientId << " corporal temperature OK!\n\n" << std::endl;
+      output_file << sensor << "Patient " << patientId << " corporal temperature OK!\n\n" << std::endl;
     }
 
   } else if (sensor == "Breath"){
@@ -308,8 +301,8 @@ void ReceivePacketServer (Ptr<Socket> socket) {
       }
 
     } else {
-      std::cout << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
-      output_file << sensor << "Patient " << patientId << " levels OK!\n\n" << std::endl;
+      std::cout << sensor << "Patient " << patientId << " breathing frequency OK!\n\n" << std::endl;
+      output_file << sensor << "Patient " << patientId << " breathing frequency OK!\n\n" << std::endl;
     }
     
   }
@@ -324,24 +317,32 @@ void TemperatureActuatorAction (Ptr<Socket> socket) {
   pkt->CopyData(buffer, pkt->GetSize ());
   std::string rawData = std::string((char*)buffer);
 
-  if (!(rawData.find("INTERMEDIATE2ACT") != -1)) return;
+  if (!(rawData.find("INTERMEDIATE2TEMP") != -1)) return;
+  std::string recvNodeId = std::to_string(socket->GetNode()->GetId()-2);
 
   std::vector<std::string> data = customSplit(rawData, ' ');
-  std::string patientId = data[0];
-  std::string signal = data[1];
+  std::string patientId = data[2];
+  std::string signal = data[3];
+  std::string nodeId = data[0];
+
+  if (nodeId != recvNodeId) return;
+  std::cout <<"NodeId: " << nodeId << " RecvNodeId: " << recvNodeId << std::endl;
 
   std::string filename ("scratch/hospital_logs.txt");
   std::ofstream output_file;
   output_file.open(filename.data(), std::ios_base::app);
 
-  std::cout << "Signal Received at Temperature Actuator: " << signal << " | Patient: " << patientId << std::endl;
-  output_file << "Signal Received at Temperature Actuator: " << signal << " | Patient: " << patientId << std::endl;
-
   // Take action based on received signal
-  if (signal == "HighTemperature") {
+  if (signal.find("HighTemperature") != -1) {
+    std::cout << "Signal Received at Temperature Actuator: " << "HighTemperature" << " | Patient: " << patientId << std::endl;
+    output_file << "Signal Received at Temperature Actuator: " << "HighTemperature" << " | Patient: " << patientId << std::endl;
+
     std::cout << "Applying medication to reduce corporal temperature!" << std::endl;
     output_file << "Applying medication to reduce corporal temperature!" << std::endl;
-  } else if (signal == "LowTemperature") {
+  } else if (signal.find("LowTemperature") != -1) {
+    std::cout << "Signal Received at Temperature Actuator: " << "LowTemperature" << " | Patient: " << patientId << std::endl;
+    output_file << "Signal Received at Temperature Actuator: " << "LowTemperature" << " | Patient: " << patientId << std::endl;
+
     std::cout << "Applying medication to increase corporal temperature!" << std::endl;
     output_file << "Applying medication to increase corporal temperature!" << std::endl;
   } else {
@@ -358,26 +359,38 @@ void CardiacActuatorAction (Ptr<Socket> socket) {
   pkt->CopyData(buffer, pkt->GetSize ());
   std::string rawData = std::string((char*)buffer);
 
-  if (!(rawData.find("INTERMEDIATE2ACT") != -1)) return;
+  if (!(rawData.find("INTERMEDIATE2CARD") != -1)) return;
+  std::string recvNodeId = std::to_string(socket->GetNode()->GetId()-3);
+  //if (recvNodeId != customSplit(rawData, ';')[1]) return;
 
   std::vector<std::string> data = customSplit(rawData, ' ');
-  std::string patientId = data[0];
-  std::string signal = data[1];
+  
+  std::string patientId = data[2];
+  std::string signal = data[3];
+  std::string nodeId = data[0];
+
+  if (nodeId != recvNodeId) return;
+  std::cout <<"NodeId: " << nodeId << " RecvNodeId: " << recvNodeId << std::endl;
 
   std::string filename ("scratch/hospital_logs.txt");
   std::ofstream output_file;
   output_file.open(filename.data(), std::ios_base::app);
 
-  std::cout << "Signal Received at Cardiac Actuator: " << signal << " | Patient: " << patientId << std::endl;
-  output_file << "Signal Received at Cardiac Actuator: " << signal << " | Patient: " << patientId << std::endl;
-
   // Take action based on received signal
-  if (signal == "HighCardiacFrequency") {
+  if (signal.find("HighCardiac") != -1) {
+    std::cout << "Signal Received at Cardiac Actuator: " << "HighCardiac" << " | Patient: " << patientId << std::endl;
+    output_file << "Signal Received at Cardiac Actuator: " << "HighCardiac" << " | Patient: " << patientId << std::endl;
+
     std::cout << "Applying medication to reduce cardiac frequency! \nEmiting alert to nurses on call..." << std::endl;
     output_file << "Applying medication to reduce cardiac frequency! \nEmiting alert to nurses on call..." << std::endl;
-  } else if (signal == "LowCardiacFrequency") {
+
+  } else if (signal.find("LowCardiac") != -1) {
+    std::cout << "Signal Received at Cardiac Actuator: " << "LowCardiac" << " | Patient: " << patientId << std::endl;
+    output_file << "Signal Received at Cardiac Actuator: " << "LowCardiac" << " | Patient: " << patientId << std::endl;
+
     std::cout << "Applying medication to increase cardiac frequency! \nEmiting alert to nurses on call..." << std::endl;
     output_file << "Applying medication to increase cardiac frequency! \nEmiting alert to nurses on call..." << std::endl;
+
   } else {
     std::cout << "Error! Command unknown at Cardiac Actuator! Notifying nurse..." << std::endl;
     output_file << "Error! Command unknown at Cardiac Actuator! Notifying nurse..." << std::endl;
@@ -392,24 +405,35 @@ void BreathActuatorAction (Ptr<Socket> socket) {
   pkt->CopyData(buffer, pkt->GetSize ());
   std::string rawData = std::string((char*)buffer);
 
-  if (!(rawData.find("INTERMEDIATE2ACT") != -1)) return;
+  if (!(rawData.find("INTERMEDIATE2BREATH") != -1)) return;
+  std::string recvNodeId = std::to_string(socket->GetNode()->GetId()-4);
+  //if (recvNodeId != customSplit(rawData, ';')[1]) return;
 
   std::vector<std::string> data = customSplit(rawData, ' ');
-  std::string patientId = data[0];
-  std::string signal = data[1];
+  
+  std::string patientId = data[2];
+  std::string signal = data[3];
+  std::string nodeId = data[0];
+
+  if (nodeId != recvNodeId) return;
+  std::cout <<"NodeId: " << nodeId << " RecvNodeId: " << recvNodeId << std::endl;
 
   std::string filename ("scratch/hospital_logs.txt");
   std::ofstream output_file;
   output_file.open(filename.data(), std::ios_base::app);
 
-  std::cout << "Signal Received at Breath Actuator: " << signal << "| Patient: " << patientId << std::endl;
-  output_file << "Signal Received at Breath Actuator: " << signal << "| Patient: " << patientId << std::endl;
-
   // Take action based on received signal
-  if (signal == "HighCardiacFrequency") {
+  if (signal.find("HighBreath") != -1) {
+    std::cout << "Signal Received at Breath Actuator: " << "HighBreath" << "| Patient: " << patientId << std::endl;
+    output_file << "Signal Received at Breath Actuator: " << "HighBreath" << "| Patient: " << patientId << std::endl;
+
     std::cout << "Applying medication to reduce breathing frequency! \nEmiting alert to nurses on call..." << std::endl;
     output_file << "Applying medication to reduce breathing frequency! \nEmiting alert to nurses on call..." << std::endl;
-  } else if (signal == "LowCardiacFrequency") {
+
+  } else if (signal.find("LowBreath") != -1) {
+    std::cout << "Signal Received at Breath Actuator: " << "LowBreath" << "| Patient: " << patientId << std::endl;
+    output_file << "Signal Received at Breath Actuator: " << "LowBreath" << "| Patient: " << patientId << std::endl;
+
     std::cout << "Applying medication to increase breathing frequency! \nEmiting alert to nurses on call..." << std::endl;
     output_file << "Applying medication to increase breathing frequency! \nEmiting alert to nurses on call..." << std::endl;
   } else {
@@ -426,24 +450,31 @@ void OxygenActuatorAction (Ptr<Socket> socket) {
   pkt->CopyData(buffer, pkt->GetSize ());
   std::string rawData = std::string((char*)buffer);
 
-  if (!(rawData.find("INTERMEDIATE2ACT") != -1)) return;
+  if (!(rawData.find("INTERMEDIATE2OXYGEN") != -1)) return;
+  std::string recvNodeId = std::to_string(socket->GetNode()->GetId()-1);
+  //if (recvNodeId != customSplit(rawData, ';')[1]) return;
 
   std::vector<std::string> data = customSplit(rawData, ' ');
   
-  std::string patientId = data[0];
-  std::string signal = data[1];
+  std::string patientId = data[2];
+  std::string signal = data[3];
+  std::string nodeId = data[0];
+
+  if (nodeId != recvNodeId) return;
+  std::cout <<"NodeId: " << nodeId << " RecvNodeId: " << recvNodeId << std::endl;
 
   std::string filename ("scratch/hospital_logs.txt");
   std::ofstream output_file;
   output_file.open(filename.data(), std::ios_base::app);
 
-  std::cout << "Signal Received at Oxygen Actuator: " << signal << " | Patient: " << patientId << std::endl;
-  output_file << "Signal Received at Oxygen Actuator: " << signal << " | Patient: " << patientId << std::endl;
-
   // Take action based on received signal
-  if (signal == "LowOxygen") {
+  if (signal.find("LowOxygen") != std::string::npos) {
+    std::cout << "Signal Received at Oxygen Actuator: " << "LowOxygen" << " | Patient: " << patientId << std::endl;
+    output_file << "Signal Received at Oxygen Actuator: " << "LowOxygen" << " | Patient: " << patientId << std::endl;
+
     std::cout << "Applying medication to increase oxygen levels! \nEmiting alert to nurses on call..." << std::endl;
     output_file << "Applying medication to increase oxygen levels! \nEmiting alert to nurses on call..." << std::endl;
+
   } else {
     std::cout << "Error! Command unknown at Oxygen Actuator! Notifying nurse..." << std::endl;
     output_file << "Error! Command unknown at Oxygen Actuator! Notifying nurse..." << std::endl;
@@ -576,7 +607,9 @@ int main (int argc, char *argv[]) {
     positionAlloc->Add (Vector (1.0, i, 0.0));
     positionAlloc->Add (Vector (2.0, i, 0.0));
     positionAlloc->Add (Vector (3.0, i, 0.0));
+
     positionAlloc->Add (Vector (4.0, i, 2.0));
+
     positionAlloc->Add (Vector (0.0, i, 1.0));
     positionAlloc->Add (Vector (1.0, i, 1.0));
     positionAlloc->Add (Vector (2.0, i, 1.0));
@@ -615,28 +648,24 @@ int main (int argc, char *argv[]) {
     InetSocketAddress oxygenActAddress = InetSocketAddress (Ipv4Address::GetAny (), 80);
     oxygenActSockets[i]->Bind(oxygenActAddress);
     oxygenActSockets[i]->SetRecvCallback (MakeCallback (&OxygenActuatorAction));
-    oxygenRemotes.push_back(InetSocketAddress (patientsFlow.Get (oxygenActId)->GetObject<Ipv4>()->GetAddress (1,0).GetLocal (), 80));
 
     // Cardiac Actuators
     cardActSockets.push_back(Socket::CreateSocket (patientsFlow.Get (cardActId), actTid));
     InetSocketAddress cardActAddress = InetSocketAddress (Ipv4Address::GetAny (), 80);
     cardActSockets[i]->Bind(cardActAddress);
     cardActSockets[i]->SetRecvCallback (MakeCallback (&CardiacActuatorAction));
-    cardRemotes.push_back(InetSocketAddress (patientsFlow.Get (cardActId)->GetObject<Ipv4>()->GetAddress (1,0).GetLocal (), 80));
 
     // Temperature Actuators
     tempActSockets.push_back(Socket::CreateSocket (patientsFlow.Get (tempActId), actTid));
     InetSocketAddress tempActAddress = InetSocketAddress (Ipv4Address::GetAny (), 80);
     tempActSockets[i]->Bind(tempActAddress);
     tempActSockets[i]->SetRecvCallback (MakeCallback (&TemperatureActuatorAction));
-    tempRemotes.push_back(InetSocketAddress (patientsFlow.Get (tempActId)->GetObject<Ipv4>()->GetAddress (1,0).GetLocal (), 80));
 
     // Breath Actuators
     breathActSockets.push_back(Socket::CreateSocket (patientsFlow.Get (breathActId), actTid));
     InetSocketAddress breathActAddress = InetSocketAddress (Ipv4Address::GetAny (), 80);
     breathActSockets[i]->Bind(breathActAddress);
     breathActSockets[i]->SetRecvCallback (MakeCallback (&BreathActuatorAction));
-    breathRemotes.push_back(InetSocketAddress (patientsFlow.Get (breathActId)->GetObject<Ipv4>()->GetAddress (1,0).GetLocal (), 80));
 
     oxygenActId+=9;
     tempActId+=9;
@@ -650,7 +679,6 @@ int main (int argc, char *argv[]) {
   tempActId = 6;
   cardActId = 7;
   breathActId = 8;
-  InetSocketAddress remoteServer = InetSocketAddress (Ipv4Address ("10.1.1.0"), 80);
   for (int i = 0; i < n_rows; i++) {
     intermediateSocketsServer.push_back(Socket::CreateSocket (patientsFlow.Get (intermediate), tid));
 
@@ -665,22 +693,19 @@ int main (int argc, char *argv[]) {
     intermediateSocketsServer[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     intermediateSocketsToBreathAct[i]->SetAllowBroadcast (true);
-    intermediateSocketsToBreathAct[i]->Connect (breathRemotes[i]);
+    intermediateSocketsToBreathAct[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     intermediateSocketsToCardAct[i]->SetAllowBroadcast (true);
-    intermediateSocketsToCardAct[i]->Connect (cardRemotes[i]);
+    intermediateSocketsToCardAct[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     intermediateSocketsToTempAct[i]->SetAllowBroadcast (true);
-    intermediateSocketsToTempAct[i]->Connect (tempRemotes[i]);
+    intermediateSocketsToTempAct[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     intermediateSocketsToOxygenAct[i]->SetAllowBroadcast (true);
-    intermediateSocketsToOxygenAct[i]->Connect (oxygenRemotes[i]);
+    intermediateSocketsToOxygenAct[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     intermediateSocketsServer[i]->Bind(local);
     intermediateSocketsServer[i]->SetRecvCallback (MakeCallback (&ReceivePacket));
-
-
-    intermediateRemotes.push_back(InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     intermediate+=9;
     oxygenActId+=9;
@@ -698,22 +723,22 @@ int main (int argc, char *argv[]) {
     // Oxygen Sensors
     oxygenSockets.push_back(Socket::CreateSocket (patientsFlow.Get (oxygenId), tid));
     oxygenSockets[i]->SetAllowBroadcast (true);
-    oxygenSockets[i]->Connect (intermediateRemotes[i]);
+    oxygenSockets[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     // Cardiac Sensors
     cardSockets.push_back(Socket::CreateSocket (patientsFlow.Get (cardId), tid));
     cardSockets[i]->SetAllowBroadcast (true);
-    cardSockets[i]->Connect (intermediateRemotes[i]);
+    cardSockets[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     // Temperature Sensors
     tempSockets.push_back(Socket::CreateSocket (patientsFlow.Get (tempId), tid));
     tempSockets[i]->SetAllowBroadcast (true);
-    tempSockets[i]->Connect (intermediateRemotes[i]);
+    tempSockets[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     // Breath Sensors
     breathSockets.push_back(Socket::CreateSocket (patientsFlow.Get (breathId), tid));
     breathSockets[i]->SetAllowBroadcast (true);
-    breathSockets[i]->Connect (intermediateRemotes[i]);
+    breathSockets[i]->Connect (InetSocketAddress (Ipv4Address ("255.255.255.255"), 80));
 
     oxygenId+=9;
     tempId+=9;
@@ -723,10 +748,11 @@ int main (int argc, char *argv[]) {
 
   std::vector<std::string> sensorNames = {"Oxygen", "Cardiac", "Temperature", "Breath"};
   int readings =0;
+  int timer = 0;
   for (auto& row : sensorReader) {
-    std::cout << "Reading: " << readings++ << std::endl;
+    std::cout << "Scheduling Reading: " << readings++ << std::endl;
     std::string patientId = row["patient"].get<std::string>();
-    int timer = 0;
+    
     for (auto& sensor : sensorNames){
       std::ostringstream msg;
 
@@ -735,34 +761,35 @@ int main (int argc, char *argv[]) {
         Ptr<Packet> packet = Create<Packet>((uint8_t*) msg.str().c_str(), msg.str().length());
 
         Simulator::ScheduleWithContext (oxygenSockets[std::stoi(patientId)]->GetNode ()->GetId (),
-                                        Seconds (timer*1.5), &GenerateTraffic,
+                                        Seconds (timer*3), &GenerateTraffic,
                                         oxygenSockets[std::stoi(patientId)], packetSize, numPackets, interPacketInterval, 
                                         packet);
       } else if (sensor == "Cardiac"){
         msg << "SENSOR;" + patientId + " Cardiac " + std::to_string(row["card_freq"].get<int>()) << '\0';
         Ptr<Packet> packet = Create<Packet>((uint8_t*) msg.str().c_str(), msg.str().length());
         Simulator::ScheduleWithContext (cardSockets[std::stoi(patientId)]->GetNode ()->GetId (),
-                                        Seconds (timer*1.5), &GenerateTraffic,
+                                        Seconds (timer*3), &GenerateTraffic,
                                         cardSockets[std::stoi(patientId)], packetSize, numPackets, interPacketInterval, 
                                         packet);
       } else if (sensor == "Temperature"){
         msg << "SENSOR;" + patientId + " Temperature " + std::to_string(row["temp"].get<float>()) << '\0';
         Ptr<Packet> packet = Create<Packet>((uint8_t*) msg.str().c_str(), msg.str().length());
         Simulator::ScheduleWithContext (tempSockets[std::stoi(patientId)]->GetNode ()->GetId (),
-                                        Seconds (timer*1.5), &GenerateTraffic,
+                                        Seconds (timer*3), &GenerateTraffic,
                                         tempSockets[std::stoi(patientId)], packetSize, numPackets, interPacketInterval, 
                                         packet);
       } else if (sensor == "Breath"){
         msg << "SENSOR;" + patientId + " Breath " + std::to_string(row["breath_freq"].get<int>()) << '\0';
         Ptr<Packet> packet = Create<Packet>((uint8_t*) msg.str().c_str(), msg.str().length());
         Simulator::ScheduleWithContext (breathSockets[std::stoi(patientId)]->GetNode ()->GetId (),
-                                        Seconds (timer*1.5), &GenerateTraffic,
+                                        Seconds (timer*3), &GenerateTraffic,
                                         breathSockets[std::stoi(patientId)], packetSize, numPackets, interPacketInterval, 
                                         packet);
       }
 
       timer++;
     }
+    timer*=2;
     std::cout << "-------------------------------------------------" << std::endl;
   }
 
