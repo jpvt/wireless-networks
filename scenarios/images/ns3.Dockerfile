@@ -17,15 +17,6 @@ WORKDIR /usr/local/ns-allinone-3.37/ns-3.37
 RUN ./ns3 configure --enable-examples --enable-tests \
     && ./ns3 build
 
-# Install 5G Lena project and rebuild
-RUN cd contrib && \
-    git clone https://gitlab.com/cttc-lena/nr.git && \
-    cd nr && \
-    git checkout 5g-lena-v2.3.y \
-    && cd ../../  \
-    && ./ns3 configure --enable-examples --enable-tests \
-    && ./ns3 build
-
 # Test installation is successful
 RUN ./ns3 run test.py
 

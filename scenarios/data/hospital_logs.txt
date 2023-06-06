@@ -1,0 +1,150 @@
+Node 4(Oxygen's sensor of Patient 0) sending reading: 0.950000 to Node 5 (Intermediate Node)
+Node 5(Intermediate Node of patient 0) received package from Node 4 (Oxygen's sensor) with reading 0.950000 sending it to Node 0 (Server)...
+Current path: 4-5
+Node 0 (Server) received package from Node 5 (Intermediate Node of Patient 0) with Oxygen's reading 0.950000
+Current path: 4-5-0
+Patient 0 oxygen levels OK!
+Node 3(Cardiac's sensor of Patient 0) sending reading: 80 to Node 5 (Intermediate Node)
+Node 5(Intermediate Node of patient 0) received package from Node 3 (Cardiac's sensor) with reading 80 sending it to Node 0 (Server)...
+Current path: 3-5
+Node 0 (Server) received package from Node 5 (Intermediate Node of Patient 0) with Cardiac's reading 80
+Current path: 3-5�-0
+Patient 0 cardiac frequency OK!
+Node 2(Temperature's sensor of Patient 0) sending reading: 37.000000 to Node 5 (Intermediate Node)
+Node 5(Intermediate Node of patient 0) received package from Node 2 (Temperature's sensor) with reading 37.000000 sending it to Node 0 (Server)...
+Current path: 2-5
+Node 0 (Server) received package from Node 5 (Intermediate Node of Patient 0) with Temperature's reading 37.000000
+Current path: 2-5-0
+Patient 0 corporal temperature OK!
+Node 1(Breath's sensor of Patient 0) sending reading: 15 to Node 5 (Intermediate Node)
+Node 5(Intermediate Node of patient 0) received package from Node 1 (Breath's sensor) with reading 15 sending it to Node 0 (Server)...
+Current path: 1-5
+Node 0 (Server) received package from Node 5 (Intermediate Node of Patient 0) with Breath's reading 15
+Current path: 1-5-0
+Patient 0 breathing frequency OK!
+Node 4(Oxygen's sensor of Patient 0) sending reading: 0.600000 to Node 5 (Intermediate Node)
+Node 5(Intermediate Node of patient 0) received package from Node 4 (Oxygen's sensor) with reading 0.600000 sending it to Node 0 (Server)...
+Current path: 4-5
+Node 0 (Server) received package from Node 5 (Intermediate Node of Patient 0) with Oxygen's reading 0.600000
+Current path: 4-5-0
+PATIENT 0 AT RISK! Oxygen Above expected
+Sending alert!
+Node 5(Intermediate Node of patient 0) received package from Node 0 (Server) with alert LowOxygen, sending it to actuator...
+Current path: 4-5-0�U-5
+Node 9(Oxygen's actuator Node of patient 0) received alert: LowOxygen
+Final Path: 4-5-0�U-5-9
+Applying medication to increase oxygen levels! 
+Emiting alert to nurses on call...
+Node 3(Cardiac's sensor of Patient 0) sending reading: 110 to Node 5 (Intermediate Node)
+Node 5(Intermediate Node of patient 0) received package from Node 3 (Cardiac's sensor) with reading 110 sending it to Node 0 (Server)...
+Current path: 3-5
+Node 0 (Server) received package from Node 5 (Intermediate Node of Patient 0) with Cardiac's reading 110
+Current path: 3-5-0
+PATIENT 0 AT RISK! Cardiac Above expected
+Sending alert!
+Node 5(Intermediate Node of patient 0) received package from Node 0 (Server) with alert HighCardiac, sending it to actuator...
+Current path: 3-5-0-5
+Node 8(Cardiac's actuator Node of patient 0) received alert: HighCardiac
+Final Path: 3-5-0-5-8
+Applying medication to reduce cardiac frequency! 
+Emiting alert to nurses on call...
+Node 2(Temperature's sensor of Patient 0) sending reading: 39.000000 to Node 5 (Intermediate Node)
+Node 5(Intermediate Node of patient 0) received package from Node 2 (Temperature's sensor) with reading 39.000000 sending it to Node 0 (Server)...
+Current path: 2-5
+Node 0 (Server) received package from Node 5 (Intermediate Node of Patient 0) with Temperature's reading 39.000000
+Current path: 2-5-0
+PATIENT 0 AT RISK! Temperature Above expected
+Sending alert!
+Node 5(Intermediate Node of patient 0) received package from Node 0 (Server) with alert HighTemperature, sending it to actuator...
+Current path: 2-5-0���U-5
+Node 7(Temperature's actuator Node of patient 0) received alert: HighTemperature
+Final Path: 2-5-0���U-5-7
+Applying medication to reduce corporal temperature!
+Node 1(Breath's sensor of Patient 0) sending reading: 8 to Node 5 (Intermediate Node)
+Node 5(Intermediate Node of patient 0) received package from Node 1 (Breath's sensor) with reading 8 sending it to Node 0 (Server)...
+Current path: 1-5
+Node 0 (Server) received package from Node 5 (Intermediate Node of Patient 0) with Breath's reading 8
+Current path: 1-5-0
+PATIENT 0 AT RISK! Breath Above expected
+Sending alert!
+Node 5(Intermediate Node of patient 0) received package from Node 0 (Server) with alert LowBreath, sending it to actuator...
+Current path: 1-5-0�U-5
+Node 6(Breath's actuator Node of patient 0) received alert: LowBreath
+Final Path: 1-5-0�U-5-6
+Applying medication to increase breathing frequency! 
+Emiting alert to nurses on call...
+Node 13(Oxygen's sensor of Patient 1) sending reading: 0.950000 to Node 14 (Intermediate Node)
+Node 14(Intermediate Node of patient 1) received package from Node 13 (Oxygen's sensor) with reading 0.950000 sending it to Node 0 (Server)...
+Current path: 13-14
+Node 0 (Server) received package from Node 14 (Intermediate Node of Patient 1) with Oxygen's reading 0.950000
+Current path: 13-14-0
+Patient 1 oxygen levels OK!
+Node 12(Cardiac's sensor of Patient 1) sending reading: 80 to Node 14 (Intermediate Node)
+Node 14(Intermediate Node of patient 1) received package from Node 12 (Cardiac's sensor) with reading 80 sending it to Node 0 (Server)...
+Current path: 12-14
+Node 0 (Server) received package from Node 14 (Intermediate Node of Patient 1) with Cardiac's reading 80
+Current path: 12-14-0
+Patient 1 cardiac frequency OK!
+Node 11(Temperature's sensor of Patient 1) sending reading: 37.000000 to Node 14 (Intermediate Node)
+Node 14(Intermediate Node of patient 1) received package from Node 11 (Temperature's sensor) with reading 37.000000 sending it to Node 0 (Server)...
+Current path: 11-14
+Node 0 (Server) received package from Node 14 (Intermediate Node of Patient 1) with Temperature's reading 37.000000
+Current path: 11-14-0
+Patient 1 corporal temperature OK!
+Node 10(Breath's sensor of Patient 1) sending reading: 15 to Node 14 (Intermediate Node)
+Node 14(Intermediate Node of patient 1) received package from Node 10 (Breath's sensor) with reading 15 sending it to Node 0 (Server)...
+Current path: 10-14
+Node 0 (Server) received package from Node 14 (Intermediate Node of Patient 1) with Breath's reading 15
+Current path: 10-14-0
+Patient 1 breathing frequency OK!
+Node 13(Oxygen's sensor of Patient 1) sending reading: 0.100000 to Node 14 (Intermediate Node)
+Node 14(Intermediate Node of patient 1) received package from Node 13 (Oxygen's sensor) with reading 0.100000 sending it to Node 0 (Server)...
+Current path: 13-14
+Node 0 (Server) received package from Node 14 (Intermediate Node of Patient 1) with Oxygen's reading 0.100000
+Current path: 13-14-0
+PATIENT 1 AT RISK! Oxygen Above expected
+Sending alert!
+Node 14(Intermediate Node of patient 1) received package from Node 0 (Server) with alert LowOxygen, sending it to actuator...
+Current path: 13-14-0-14
+Node 18(Oxygen's actuator Node of patient 1) received alert: LowOxygen
+Final Path: 13-14-0-14-18
+Applying medication to increase oxygen levels! 
+Emiting alert to nurses on call...
+Node 12(Cardiac's sensor of Patient 1) sending reading: 0 to Node 14 (Intermediate Node)
+Node 14(Intermediate Node of patient 1) received package from Node 12 (Cardiac's sensor) with reading 0 sending it to Node 0 (Server)...
+Current path: 12-14
+Node 0 (Server) received package from Node 14 (Intermediate Node of Patient 1) with Cardiac's reading 0
+Current path: 12-14-0
+PATIENT 1 AT RISK! Cardiac Above expected
+Sending alert!
+Node 14(Intermediate Node of patient 1) received package from Node 0 (Server) with alert LowCardiac, sending it to actuator...
+Current path: 12-14-00����U-14
+Node 17(Cardiac's actuator Node of patient 1) received alert: LowCardiac
+Final Path: 12-14-00����U-14-17
+Applying medication to increase cardiac frequency! 
+Emiting alert to nurses on call...
+Node 11(Temperature's sensor of Patient 1) sending reading: 0.000000 to Node 14 (Intermediate Node)
+Node 14(Intermediate Node of patient 1) received package from Node 11 (Temperature's sensor) with reading 0.000000 sending it to Node 0 (Server)...
+Current path: 11-14
+Node 0 (Server) received package from Node 14 (Intermediate Node of Patient 1) with Temperature's reading 0.000000
+Current path: 11-14-0
+PATIENT 1 AT RISK! Temperature Above expected
+Sending alert!
+Node 14(Intermediate Node of patient 1) received package from Node 0 (Server) with alert LowTemperature, sending it to actuator...
+Current path: 11-14-0�U-14
+Node 16(Temperature's actuator Node of patient 1) received alert: LowTemperature
+Final Path: 11-14-0�U-14-16
+Applying medication to increase corporal temperature!
+Node 10(Breath's sensor of Patient 1) sending reading: 0 to Node 14 (Intermediate Node)
+Node 14(Intermediate Node of patient 1) received package from Node 10 (Breath's sensor) with reading 0 sending it to Node 0 (Server)...
+Current path: 10-14
+Node 0 (Server) received package from Node 14 (Intermediate Node of Patient 1) with Breath's reading 0
+Current path: 10-14-0
+PATIENT 1 AT RISK! Breath Above expected
+Sending alert!
+Node 14(Intermediate Node of patient 1) received package from Node 0 (Server) with alert LowBreath, sending it to actuator...
+Current path: 10-14-0-14
+Node 15(Breath's actuator Node of patient 1) received alert: LowBreath
+Final Path: 10-14-0-14-15
+Applying medication to increase breathing frequency! 
+Emiting alert to nurses on call...
